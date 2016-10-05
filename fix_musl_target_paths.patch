@@ -1,0 +1,59 @@
+diff --git a/src/bootstrap/compile.rs b/src/bootstrap/compile.rs
+index 16dbcae..418c3a4 100644
+--- a/src/bootstrap/compile.rs
++++ b/src/bootstrap/compile.rs
+@@ -90,16 +90,16 @@ pub fn std_link(build: &Build,
+     add_to_sysroot(&out_dir, &libdir);
+ 
+     if target.contains("musl") && !target.contains("mips") {
+-        copy_musl_third_party_objects(build, &libdir);
++        copy_musl_third_party_objects(build, target, &libdir);
+     }
+ }
+ 
+ /// Copies the crt(1,i,n).o startup objects
+ ///
+ /// Only required for musl targets that statically link to libc
+-fn copy_musl_third_party_objects(build: &Build, into: &Path) {
++fn copy_musl_third_party_objects(build: &Build, target: &str, into: &Path) {
+     for &obj in &["crt1.o", "crti.o", "crtn.o"] {
+-        copy(&build.config.musl_root.as_ref().unwrap().join("lib").join(obj), &into.join(obj));
++        copy(&build.musl_root(target).unwrap().join("lib").join(obj), &into.join(obj));
+     }
+ }
+ 
+diff --git a/src/bootstrap/config.rs b/src/bootstrap/config.rs
+index a8434c3..69bd7a7 100644
+--- a/src/bootstrap/config.rs
++++ b/src/bootstrap/config.rs
+@@ -158,6 +158,7 @@ struct TomlTarget {
+     cc: Option<String>,
+     cxx: Option<String>,
+     android_ndk: Option<String>,
++    musl_root: Option<String>,
+ }
+ 
+ impl Config {
+@@ -268,6 +269,7 @@ impl Config {
+                 }
+                 target.cxx = cfg.cxx.clone().map(PathBuf::from);
+                 target.cc = cfg.cc.clone().map(PathBuf::from);
++                target.musl_root = cfg.musl_root.clone().map(PathBuf::from);
+ 
+                 config.target_config.insert(triple.clone(), target);
+             }
+diff --git a/src/bootstrap/sanity.rs b/src/bootstrap/sanity.rs
+index c4e6399..969cd70 100644
+--- a/src/bootstrap/sanity.rs
++++ b/src/bootstrap/sanity.rs
+@@ -146,8 +146,8 @@ pub fn check(build: &mut Build) {
+                     }
+                 }
+                 None => {
+-                    panic!("when targeting MUSL either the build.musl-root \
+-                            option or the target.$TARGET.musl-root one must \
++                    panic!("when targeting MUSL either the rust.musl-root \
++                            option or the target.$TARGET.musl-root option must \
+                             be specified in config.toml")
+                 }
+             }

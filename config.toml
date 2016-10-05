@@ -1,0 +1,25 @@
+[llvm]
+
+# Slightly faster build of LLVM - why not
+ninja = true
+
+[build]
+
+target = ["arm-unknown-linux-musleabi",
+          "arm-unknown-linux-musleabihf",
+          "armv7-unknown-linux-musleabihf"]
+
+[rust]
+
+[target.arm-unknown-linux-musleabihf]
+cc = "/x-tools/arm-unknown-linux-musleabihf/bin/arm-unknown-linux-musleabihf-gcc"
+musl-root = "/x-tools/arm-unknown-linux-musleabihf/arm-unknown-linux-musleabihf/sysroot/usr"
+
+[target.arm-unknown-linux-musleabi]
+cc = "/x-tools/arm-unknown-linux-musleabi/bin/arm-unknown-linux-musleabi-gcc"
+musl-root = "/x-tools/arm-unknown-linux-musleabi/arm-unknown-linux-musleabi/sysroot/usr"
+
+[target.armv7-unknown-linux-musleabihf]
+cc = "/x-tools/armv7-unknown-linux-musleabihf/bin/armv7-unknown-linux-musleabihf-gcc"
+musl-root = "/x-tools/armv7-unknown-linux-musleabihf/armv7-unknown-linux-musleabihf/sysroot/usr"
+
