@@ -70,7 +70,7 @@ cleanup_deps() {
 create_rustbuild_owned_dir() {
     local new_dir=$1
     sudo mkdir $new_dir
-    sudo chown rustbuild:rustbuild $newdir
+    sudo chown rustbuild:rustbuild $new_dir
 }
 
 install_crosstool_ng() {
@@ -83,7 +83,8 @@ install_crosstool_ng() {
     curl $uri | tar xj
     pushd crosstool-ng
     ./configure --prefix=/usr/local
-    make && make install
+    make
+    sudo make install
     popd
     rm -rf crosstool-ng
 }
@@ -176,7 +177,7 @@ install_cargo() {
 
 main() {
     install_deps
-    create_rustbuild_owned_dir /build
+    sudo chown -R rustbuild:rustbuild /build
     cd /build
 
     install_crosstool_ng
@@ -191,3 +192,11 @@ main() {
     cleanup_deps
     create_rustbuild_owned_dir /source
 }
+
+dev() {
+    sudo chown -R rustbuild:rustbuild /build
+    cd /build
+    $@
+}
+
+dev $@
